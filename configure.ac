@@ -42,6 +42,9 @@ nw="$nw -Wtraditional"          # All compilers nowadays support ANSI C
 nw="$nw -Wtraditional-conversion" # We always use prototypes
 nw="$nw -Wconversion"           # These warnings usually don't point to mistakes.
 nw="$nw -Wpadded"               # padded structs are OK
+nw="$nw -Wsuggest-attribute=pure" # don't want it to suggest non-standard things
+nw="$nw -Wsuggest-attribute=const" # don't want it to suggest non-standard things
+nw="$nw -Wsuggest-attribute=noreturn" # don't want it to suggest non-standard things
 # Enable all GCC warnings not in this list.
 gl_MANYWARN_ALL_GCC([warnings])
 gl_MANYWARN_COMPLEMENT([warnings], [$warnings], [$nw])

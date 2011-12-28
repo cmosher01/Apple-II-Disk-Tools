@@ -1,0 +1,17 @@
+QUICK START
+
+When fetching sources directly from the source code repository,
+use the following command to get the necessary dependencies, etc.,
+for a working configure script.
+
+    ./bootstrap --skip-po
+
+After that, you can use the normal build steps documented in INSTALL.
+
+IN DEPTH
+
+The bootstrap script is from gnulib. It will download the latest
+version of gnulib, run gnulib-tool, autoconf, and friends. For
+more information, run
+
+    ./bootstrap --help

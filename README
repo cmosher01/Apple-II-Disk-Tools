@@ -1,0 +1,22 @@
+a2catalog
+
+This contains a couple of small programs for dealing with a subset of
+functions concerning Apple ][ floppy disk images.
+
+
+
+a2catalog program is for generating the "VTOC" and catalog track (usually
+$11) for Apple ][ floppy disk images.
+
+a2nibblize program is for encoding (not decoding) "nibble" format Apple ][
+floppy disk images.
+
+
+
+When downloading sources directly from the source code repository, see:
+
+    README-hacking
+
+Otherwise, such as when downloading the .tar.gz source distribution, see:
+
+    INSTALL
