@@ -45,6 +45,8 @@ nw="$nw -Wpadded"               # padded structs are OK
 nw="$nw -Wsuggest-attribute=pure" # don't want it to suggest non-standard things
 nw="$nw -Wsuggest-attribute=const" # don't want it to suggest non-standard things
 nw="$nw -Wsuggest-attribute=noreturn" # don't want it to suggest non-standard things
+nw="$nw -Wabi"                  # prevent error on cygwin
+nw="$nw -Wdeprecated"           # prevent error on cygwin
 # Enable all GCC warnings not in this list.
 gl_MANYWARN_ALL_GCC([warnings])
 gl_MANYWARN_COMPLEMENT([warnings], [$warnings], [$nw])
