@@ -1,0 +1,14 @@
+/Makefile.am
+/binary-io.h
+/dummy.c
+/fcntl.in.h
+/getopt.c
+/getopt.in.h
+/getopt1.c
+/getopt_int.h
+/gettext.h
+/minmax.h
+/stddef.in.h
+/stdint.in.h
+/stdlib.in.h
+/unistd.in.h
