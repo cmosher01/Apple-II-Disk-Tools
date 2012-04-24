@@ -80,7 +80,7 @@ AC_TYPE_UINT8_T
 
 # Checks for library functions.
 AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.17])
+AM_GNU_GETTEXT_VERSION([0.18.1])
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([getpagesize memset strchr strtol])
 gl_INIT
