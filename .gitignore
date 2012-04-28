@@ -1,9 +1,8 @@
-/.project
 /ABOUT-NLS*
 /Makefile.in
 /aclocal.m4
 /autom4te.cache/
-/build-aux
+/build-aux/
 /config.h.in*
 /configure
 /gnulib/
