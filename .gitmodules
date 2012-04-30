@@ -1,0 +1,3 @@
+[submodule "src/ctest"]
+	path = src/ctest
+	url = git://github.com/cmosher01/ctest.git
