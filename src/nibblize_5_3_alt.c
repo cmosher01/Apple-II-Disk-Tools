@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "ctest.h"
+#include "ctest/ctest.h"
 #include "nibblize_5_3_common.h"
 
 static void nibblize(const uint8_t **pdata, uint8_t **encoded)

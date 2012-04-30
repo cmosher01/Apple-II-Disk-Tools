@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <binary-io.h>
 
-#include "ctest.h"
+#include "ctest/ctest.h"
 #include "a2const.h"
 #include "a2nibblize_opt.h"
 #include "nibblize_4_4.h"
