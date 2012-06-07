@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT([a2catalog],[1.0-SNAPSHOT])
+AC_INIT([a2catalog],[1.0])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([src/a2catalog.c])
 AC_CONFIG_HEADERS([config.h])
