@@ -6,7 +6,7 @@ AC_INIT([a2catalog],[1.1-SNAPSHOT])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([src/a2catalog.c])
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE([-Wall -Werror])
+AM_INIT_AUTOMAKE([-Wall])
 
 # Checks for programs.
 AC_PROG_CC
