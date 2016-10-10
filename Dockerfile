@@ -38,15 +38,19 @@ WORKDIR a2catalog
 
 USER root
 
+RUN chmod a+w /usr/local/bin
+RUN rm -Rf /var/www/html && ln -s $(pwd) /var/www/html
+RUN rm -f /etc/service/nginx/down
+
 COPY bootstrap bootstrap.conf configure.ac Makefile.am ./
 
 COPY NEWS README* AUTHORS ChangeLog COPYING* ./
 
+COPY index.html ./
+
 COPY src/ ./src/
 COPY po/ ./po/
 RUN chown -R app: *
-
-RUN chmod a+w /usr/local/bin
 
 USER app
 
@@ -62,3 +66,5 @@ RUN make dist 2>&1 | tee -a $BUILD_LOG
 RUN make distcheck 2>&1 | tee -a $BUILD_LOG
 RUN make install 2>&1 | tee -a $BUILD_LOG
 RUN make installcheck 2>&1 | tee -a $BUILD_LOG
+
+USER root

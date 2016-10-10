@@ -3,3 +3,5 @@ version: '2'
 services:
   a2catalog:
     build: .
+    ports:
+      - "80:80"
