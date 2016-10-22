@@ -67,4 +67,6 @@ RUN make distcheck 2>&1 | tee -a $BUILD_LOG
 RUN make install 2>&1 | tee -a $BUILD_LOG
 RUN make installcheck 2>&1 | tee -a $BUILD_LOG
 
+RUN ln -s a2catalog-*.tar.gz a2catalog.tar.gz
+
 USER root
