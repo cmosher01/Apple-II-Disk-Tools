@@ -40,6 +40,7 @@ USER root
 
 RUN chmod a+w /usr/local/bin
 RUN rm -Rf /var/www/html && ln -s $HOME /var/www/html
+RUN sed -i "s/worker_processes.*/worker_processes 1;/" /etc/nginx/nginx.conf
 RUN rm -f /etc/service/nginx/down
 
 COPY bootstrap bootstrap.conf configure.ac Makefile.am ./
