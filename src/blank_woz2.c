@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     uint16_t ram = 0;
     fwrite(&ram, sizeof(ram), 1, woz2);
 
-    uint16_t blocksPerTrack = (bitsPerTrack/8u + 511u) / 512u;
+    uint16_t blocksPerTrack = (bitsPerTrack/8u + 0x200u - 1u) / 0x200u;
     fwrite(&blocksPerTrack, sizeof(blocksPerTrack), 1, woz2);
 
     uint8_t fill = 0;
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 
 
     fwrite("TRKS", 1, 4, woz2);
-    uint32_t sizeTrks = C_QTRACK*8;
+    uint32_t sizeTrks = C_QTRACK*8 + C_REAL_TRACK*blocksPerTrack*0x200u;
     fwrite(&sizeTrks, sizeof(sizeTrks), 1, woz2);
     uint16_t block = 3;
     for (uint8_t qt = 0; qt < C_REAL_TRACK; ++qt) {
