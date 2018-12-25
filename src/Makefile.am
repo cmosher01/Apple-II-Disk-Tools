@@ -5,7 +5,7 @@ LDADD = $(top_builddir)/lib/liba2catalog.a $(LIBINTL)
 
 
 
-bin_PROGRAMS=a2catalog a2nibblize blank_woz2
+bin_PROGRAMS=a2catalog a2nibblize to_woz2
 
 a2catalog_SOURCES=\
 a2catalog.c\
@@ -33,8 +33,21 @@ a2const.h\
 ctest/ctest.c\
 ctest/ctest.h
 
-blank_woz2_SOURCES=\
-blank_woz2.c
+to_woz2_SOURCES=\
+to_woz2.c\
+nibblize_4_4.c\
+nibblize_4_4.h\
+nibblize_5_3.c\
+nibblize_5_3.h\
+nibblize_5_3_alt.c\
+nibblize_5_3_alt.h\
+nibblize_5_3_common.c\
+nibblize_5_3_common.h\
+nibblize_6_2.c\
+nibblize_6_2.h\
+a2const.h\
+ctest/ctest.c\
+ctest/ctest.h
 
 
 
