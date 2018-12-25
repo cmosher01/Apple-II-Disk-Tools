@@ -109,7 +109,7 @@ static void trks() {
         fwrite(&block, sizeof(block), 1, woz);
         uint16_t blocksPerTrack = BLOCKS_PER_TRACK;
         fwrite(&blocksPerTrack, sizeof(blocksPerTrack), 1, woz);
-        uint32_t bitsPerTrack = BITS_PER_TRACK;
+        uint32_t bitsPerTrack = 0xC5C0u;//BITS_PER_TRACK;
         fwrite(&bitsPerTrack, sizeof(bitsPerTrack), 1, woz);
 
         block += BLOCKS_PER_TRACK;
@@ -125,6 +125,37 @@ static void trks() {
 }
 
 
+
+
+
+static uint8_t mp_sector13[13];
+
+static void build_mp_sector13() {
+    uint8_t s = 0;
+    for (uint_fast8_t i = 0; i < 13; ++i) {
+        mp_sector13[i] = s;
+        s += 10;
+        s %= 13;
+    }
+}
+
+static uint8_t map_sector_13(uint8_t s) {
+    return mp_sector13[s];
+}
+
+static const uint8_t mp_sector16do[] = { 0x0, 0x7, 0xE, 0x6, 0xD, 0x5, 0xC, 0x4, 0xB, 0x3, 0xA, 0x2, 0x9, 0x1, 0x8, 0xF };
+static const uint8_t mp_sector16po[] = { 0x0, 0x8, 0x1, 0x9, 0x2, 0xA, 0x3, 0xB, 0x4, 0xC, 0x5, 0xD, 0x6, 0xE, 0x7, 0xF };
+
+static uint8_t map_sector_do16(uint8_t s) {
+    return mp_sector16do[s];
+}
+
+static long int sector_offset(uint_fast8_t dos33, uint8_t track, uint8_t sector) {
+    if (dos33) {
+        return (track * 16 * BYTES_PER_SECTOR) + (map_sector_do16(sector) * BYTES_PER_SECTOR);
+    }
+    return (track * 13 * BYTES_PER_SECTOR) + (map_sector_13(sector) * BYTES_PER_SECTOR);
+}
 
 
 
@@ -214,6 +245,9 @@ static uint32_t writeAddr(uint32_t i, uint8_t volume, uint8_t track, uint8_t sec
     i = writeHeadMarker(i);
     i = writeAddrId(i, dos33);
 
+    if (!dos33) {
+        sector = map_sector_13(sector);
+    }
     i = writeWord(i, nibblize_4_4_encode(volume));
     i = writeWord(i, nibblize_4_4_encode(track));
     i = writeWord(i, nibblize_4_4_encode(sector));
@@ -277,10 +311,11 @@ static void bits(uint_fast8_t dos33) {
         clear();
         if (dsk) {
             uint32_t i = 0;
-            i = writeSyncGap(i, 0x30u, 1+dos33);
+            i = writeSyncGap(i, 0x20u, 1+dos33);
             for (uint8_t s = 0; s < (dos33 ? 16 : 13); ++s) {
-                printf("%1X ", s); fflush(stdout);
+                printf("%1X ", s);
                 memset(sector, 0, BYTES_PER_SECTOR);
+                fseek(dsk, sector_offset(dos33, t, s), SEEK_SET);
                 size_t c_read = fread(sector, 1, BYTES_PER_SECTOR, dsk);
                 if (c_read < BYTES_PER_SECTOR) {
                     fprintf(stderr, "not enough input bytes, filling with zeroes\n");
@@ -289,10 +324,9 @@ static void bits(uint_fast8_t dos33) {
                 i = writeAddr(i, 0xFEu, t, s, dos33);
                 i = writeSyncGap(i, 0x08u, 1+dos33);
                 i = writeData(i, sector, deduce_encoding(dos33, t, s));
-                i = writeSyncGap(i, 0x1Cu, 1+dos33);
+                i = writeSyncGap(i, 0x10u, 1+dos33);
             }
             printf("\n");
-            //i = writeSyncGap(i, dos33 ? 0x110u-16 : 0x240u, 1+dos33);
         }
         fwrite(trk, 0x200, BLOCKS_PER_TRACK, woz);
     }
@@ -344,6 +378,7 @@ int main(int argc, char *argv[]) {
         printf("To force the type, append colon and type to the file name.\n");
         printf("For example: \"somefile.foo:.dsk\" .\n");
         return 1;
+        // TODO handle ProDOS-order sectors
         // TODO handle multiple input files
         // TODO optional output file (deduce output file name from input file name)
     }
@@ -370,7 +405,7 @@ int main(int argc, char *argv[]) {
     uint_fast8_t dos33 = 1;
     if (name_dsk) {
         dos33 = deduce_filetype_from_name(name_dsk);
-        printf("%s filetype: %s-sector\n", name_dsk, dos33 ? "16" : "13");
+        printf("%s filetype: %d-sector\n", name_dsk, (dos33 ? 16 : 13));
 
         char *filename = parse_filename(name_dsk);
         dsk = fopen(filename, "rb");
@@ -380,6 +415,8 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "cannot open file %s\n", name_dsk);
             exit(1);
         }
+
+        build_mp_sector13();
     }
 
     woz = fopen(name_woz, "wb");
