@@ -10,16 +10,29 @@
 #include "nibblize_6_2.h"
 
 
+
+// convert DO or D13 to WOZ according to
+// WOX 2.0 spec. standard
+
+// number of quarter-tracks defined in WOZ standard
 #define C_QTRACK (0x28u*4)
+
+// number of tracks on normal floppy
 #define C_REAL_TRACK 0x23u
+
+// quarter-tracks on normal floppy: 0, 0.25, 0.5, 0.75, 1, ..., 33.5, 33.75, 34
 #define C_REAL_QTRACK (C_REAL_TRACK*4-3)
-#define BITS_PER_TRACK 0xD000u
-#define BLOCKS_PER_TRACK ((BITS_PER_TRACK/8u + 0x200u - 1u) / 0x200u)
+
+// number of 512-byte blocks for each track
+// (must be more than enough for the longest track we need)
+//  1 block  can hold 0x1000 bits
+// 14 blocks can hold 0xE000 bits
+#define BLOCKS_PER_TRACK 14
 
 
 
-static FILE *dsk;
-static FILE *woz;
+static FILE *dsk = 0;
+static FILE *woz = 0;
 
 
 
@@ -100,7 +113,7 @@ static void tmap() {
     }
 }
 
-static void trks() {
+static void trks(uint32_t bitsPerTrack) {
     fwrite("TRKS", 1, 4, woz);
     uint32_t sizeTrks = C_QTRACK*8 + C_REAL_TRACK*BLOCKS_PER_TRACK*0x200u;
     fwrite(&sizeTrks, sizeof(sizeTrks), 1, woz);
@@ -109,7 +122,6 @@ static void trks() {
         fwrite(&block, sizeof(block), 1, woz);
         uint16_t blocksPerTrack = BLOCKS_PER_TRACK;
         fwrite(&blocksPerTrack, sizeof(blocksPerTrack), 1, woz);
-        uint32_t bitsPerTrack = 0xC5C0u;//BITS_PER_TRACK;
         fwrite(&bitsPerTrack, sizeof(bitsPerTrack), 1, woz);
 
         block += BLOCKS_PER_TRACK;
@@ -205,6 +217,21 @@ static uint32_t writeSyncByte(uint32_t i, uint_fast8_t cExtraBits) {
  * addr: head_marker addr_id   v t s   k   tail_marker tail_id
  * data: head_marker data_id   nibl+   k   tail_marker tail_id
  */
+
+/*
+For reference, this is what a 13-sector INIT tries to write:
+
+9808 * FF36 (= 88272 bits = 0x158D0) (about 1.5 revolutions)
+
+13 *
+{
+    79 * FF36 (= 711 bits)
+    FF32
+    D5 AA B5 FF FE AA AA AA AA FF FE DE AA EB (= 120 bits)
+    431 * FF32 (= 3448 bits)
+    (= 4279 bits)
+} (= 55627 bits = 0xD94B) (= 6954 8-bit bytes = 0x1B2A)
+*/
 static uint32_t writeSyncGap(uint32_t i, uint_fast16_t cBytes, const uint_fast8_t cExtraBits) {
     while (cBytes--) {
         i = writeSyncByte(i, cExtraBits);
@@ -326,8 +353,10 @@ static void bits(uint_fast8_t dos33) {
                 i = writeData(i, sector, deduce_encoding(dos33, t, s));
                 i = writeSyncGap(i, 0x10u, 1+dos33);
             }
-            printf("\n");
+        } else {
+            printf("[uninitialized]");
         }
+        printf("\n");
         fwrite(trk, 0x200, BLOCKS_PER_TRACK, woz);
     }
 }
@@ -361,7 +390,7 @@ static uint_fast8_t deduce_filetype_from_name(char *arg) {
             return 0;
         }
     }
-    fprintf(stderr, "cannot determine file type of file %s\n", arg);
+    fprintf(stderr, "ERROR: cannot determine file type of file %s\n", arg);
     exit(1);
 }
 
@@ -371,6 +400,7 @@ int main(int argc, char *argv[]) {
         printf("Converts a DOS 13- or 16-sector Apple ][ disk image to WOZ 2.0.\n");
         printf("input.dsk is the input disk image.\n");
         printf("If omitted, then a blank image is output (35 tracks all zeroes).\n");
+        printf("For a blank 13-sector image, use \":.d13\".\n");
         printf("File types are determined from the name:\n");
 //        printf("    .woz         WOZ 2.0 output file\n");
         printf("    .dsk or .do  16-sector DOS order (143360 bytes)\n");
@@ -398,7 +428,7 @@ int main(int argc, char *argv[]) {
     woz = fopen(name_woz, "rb");
     if (woz) {
         fclose(woz);
-        fprintf(stderr, "will not overwrite existing output file %s\n", name_woz);
+        fprintf(stderr, "ERROR: %s exists; will NOT overwrite existing output file\n", name_woz);
         exit(1);
     }
 
@@ -408,15 +438,27 @@ int main(int argc, char *argv[]) {
         printf("%s filetype: %d-sector\n", name_dsk, (dos33 ? 16 : 13));
 
         char *filename = parse_filename(name_dsk);
-        dsk = fopen(filename, "rb");
+        if (*filename) {
+            dsk = fopen(filename, "rb");
+            if (dsk == 0) {
+                fprintf(stderr, "ERROR: cannot open input file %s\n", name_dsk);
+                exit(1);
+            }
+        }
         free(filename);
 
-        if (dsk == 0) {
-            fprintf(stderr, "cannot open file %s\n", name_dsk);
-            exit(1);
-        }
-
         build_mp_sector13();
+    }
+
+    uint32_t bits_per_track;
+    if (dsk) {
+        if (dos33) {
+            bits_per_track = 0xC5C0u;
+        } else {
+            bits_per_track = 0xBB30;
+        }
+    } else {
+        bits_per_track = 0xE000u;
     }
 
     woz = fopen(name_woz, "wb");
@@ -424,9 +466,9 @@ int main(int argc, char *argv[]) {
 
 
     header(0); // TODO calculate CRC
-    info(0); // TODO determine if 13- or 16-sector (or both)
+    info(1+dos33);
     tmap();
-    trks();
+    trks(bits_per_track);
     bits(dos33);
 
 
