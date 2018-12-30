@@ -380,6 +380,7 @@ static char *parse_filename(char *arg) {
 static uint_fast8_t deduce_filetype_from_name(char *arg) {
     char *dot = strrchr(arg, '.');
     if (dot) {
+        // TODO case insensitive
         if (!strcmp(dot, ".dsk")) {
             return 1;
         }
@@ -450,15 +451,9 @@ int main(int argc, char *argv[]) {
         build_mp_sector13();
     }
 
-    uint32_t bits_per_track;
-    if (dsk) {
-        if (dos33) {
-            bits_per_track = 0xC5C0u;
-        } else {
-            bits_per_track = 0xBB30;
-        }
-    } else {
-        bits_per_track = 0xE000u;
+    uint32_t bits_per_track = 0xC5C0u;
+    if (dsk && !dos33) {
+        bits_per_track = 0xBB30;
     }
 
     woz = fopen(name_woz, "wb");
