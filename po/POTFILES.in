@@ -1,5 +1,0 @@
-# List of source files which contain translatable strings.
-src/a2catalog.c
-src/a2catalog_opt.c
-src/a2nibblize.c
-src/a2nibblize_opt.c

@@ -1,15 +1,20 @@
 DOCKER START
 
-For easy building, I recommend using Docker (and/or Docker Compose).
-Build with:
+For easy building, I recommend using Docker.
 
-    docker-compose build
+Build:
 
-Run with, for example:
+    docker build -t a2dt .
 
-    docker-compose run --rm a2catalog a2catalog --help
-    docker-compose run --rm a2catalog a2nibblize --help
+Run:
 
+    docker run -it --rm -v $(pwd):/root/app a2dt empty_woz2 empty.woz
+
+    docker run -it --rm -v $(pwd):/root/app a2dt to_woz2 LodeRunner.dsk LodeRunner.woz
+
+For help:
+
+    docker run -it --rm -v $(pwd):/root/app a2dt to_woz2
 
 
 

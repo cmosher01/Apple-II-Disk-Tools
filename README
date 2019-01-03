@@ -1,19 +1,21 @@
-a2catalog
+Apple ][ Disk Tools
 
-This contains a couple of small programs for dealing with a subset of
+
+
+This contains some small programs for dealing with a subset of
 functions concerning Apple ][ floppy disk images.
 
 
 
+to_woz2 converts .dsk and .d13 disk image files to WOZ 2.0 format files.
+
+empty_woz creates empty WOZ 2.0 files (no tracks).
+
 a2catalog program is for generating the "VTOC" and catalog track (usually
 $11) for Apple ][ floppy disk images.
 
-a2nibblize program is for encoding (not decoding) "nibble" format Apple ][
-floppy disk images.
-
-
-
-Home: http://mosher.mine.nu/a2catalog/
+a2nibblize program is for creating "nibble" format Apple ][
+floppy disk images. (Deprecated.)
 
 
 
