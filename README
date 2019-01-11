@@ -1,4 +1,26 @@
-Apple ][ Disk Tools
+Apple ][ Disk Tools [DEPRECATED]
+
+
+
+This entire library is now DEPRECATED:
+
+a2catalog was used in building https://github.com/cmosher01/Apple-II-Source
+but that need has been eliminated.
+
+a2nibblize was used to convert DSK images to NIB format for the
+Epple ][ emulator https://github.com/cmosher01/Epple-II but the emulator
+now uses WOZ 2 format images exclusively.
+
+to_woz2 and empty_woz (for creating WOZ 2 images) have been moved to
+https://github.com/cmosher01/DskToWoz2
+
+
+
+
+
+The following is from the original README:
+
+
 
 
 
@@ -15,7 +37,7 @@ a2catalog program is for generating the "VTOC" and catalog track (usually
 $11) for Apple ][ floppy disk images.
 
 a2nibblize program is for creating "nibble" format Apple ][
-floppy disk images. (Deprecated.)
+floppy disk images.
 
 
 
